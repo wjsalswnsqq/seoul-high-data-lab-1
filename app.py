@@ -4,7 +4,7 @@ import os
 
 # 1. 웹 페이지 기본 설정 (서울고 테마)
 st.set_page_config(
-    page_title="서울고 진로진학 데이터 연구소 JMJ",
+    page_title="서울고 진로진학 데이터",
     page_icon="🏛️",
     layout="centered"
 )
@@ -79,8 +79,8 @@ st.markdown("""
 st.markdown("""
 <div style='text-align: center; padding: 40px 0 20px 0;'>
     <div style='font-size: 3.5rem; margin-bottom: 10px;'>🏛️</div>
-    <h1 style='color: #0F172A; font-size: 2.2rem; margin: 0; font-weight: 800; letter-spacing: -1px;'>서울고등학교 진로진학 데이터 연구소</h1>
-    <p style='color: #64748B; font-size: 1.1rem; margin-top: 10px; font-weight: 500;'>JMJ가 만든 첫번째 버전</p>
+    <h1 style='color: #0F172A; font-size: 2.2rem; margin: 0; font-weight: 800; letter-spacing: -1px;'>서울고등학교 진로진학 데이터</h1>
+    <p style='color: #64748B; font-size: 1.1rem; margin-top: 10px; font-weight: 500;'>JMJ V1</p>
 </div>
 <div style='text-align: center; padding-bottom: 40px;'>
     <div style='display: inline-block; background-color: #E0F2FE; padding: 8px 20px; border-radius: 50px;'>
@@ -89,7 +89,7 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
-# 3. 데이터 로직 (엔진 동일)
+# 3. 데이터 로직
 @st.cache_data
 def load_data():
     file_path = 'data.csv' if os.path.exists('data.csv') else 'data.xlsx'
@@ -142,7 +142,8 @@ if not df.empty:
             d_keyword = st.text_input("💻 Department", placeholder="학과/모집단위를 입력하세요")
         
         st.write("") 
-        submit_button = st.form_submit_button("RUN ANALYSIS", use_container_width=True)
+        # 🌟 영어(RUN ANALYSIS)였던 버튼을 직관적인 한글 '검색'으로 변경했습니다.
+        submit_button = st.form_submit_button("🔍 검색", use_container_width=True)
 
     if submit_button:
         if u_keyword or d_keyword:
@@ -168,7 +169,7 @@ if not df.empty:
                         if has_note and row['비고'] != '-': 
                             st.markdown(f"**📎 추가정보:** {row['비고']}")
         else:
-            st.info("검색어를 입력하고 RUN ANALYSIS 버튼을 클릭하십시오.")
+            st.info("검색어를 입력하고 검색 버튼을 클릭하십시오.")
 else:
     st.info("데이터 시스템 점검 중...")
 
