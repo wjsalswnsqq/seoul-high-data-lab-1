@@ -102,7 +102,7 @@ df = load_data()
 # 4. 상단 헤더
 st.markdown("""
 <div style='text-align: center; padding: 50px 0 30px 0;'>
-    <h1 style='color: #1E40AF; font-size: 2.5rem; font-weight: 900;'>🏛️ 서울고 진로진학 연구소</h1>
+    <h1 style='color: #1E40AF; font-size: 2.5rem; font-weight: 900;'>🏛️ 서울고 JMJ</h1>
     <p style='color: #64748B; font-size: 1.1rem;'>2028학년도 대학별 핵심/권장과목 통합 검색 시스템</p>
 </div>
 """, unsafe_allow_html=True)
