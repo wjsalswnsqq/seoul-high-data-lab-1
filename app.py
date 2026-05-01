@@ -9,7 +9,7 @@ st.set_page_config(
     layout="centered"
 )
 
-# --- 🎨 서울고 스타일 디자인 (CSS) ---
+# --- 🎨 서울고 남학생 개발자 스타일 디자인 ---
 st.markdown("""
 <style>
     .stApp { background-color: #F8FAFC; }
@@ -31,64 +31,75 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# 2. 헤더 디자인
 st.markdown("""
 <div style='text-align: center; padding: 40px 0 20px 0;'>
     <div style='font-size: 3.5rem; margin-bottom: 10px;'>🏛️</div>
     <h1 style='color: #0F172A; font-size: 2.2rem; font-weight: 800;'>서울고등학교 진로진학 데이터 연구소</h1>
-    <p style='color: #64748B;'>Self-Directed Career Path Explorer</p>
+    <p style='color: #64748B;'>2028학년도 대학별 핵심/권장과목 분석기</p>
 </div>
 """, unsafe_allow_html=True)
 
-# 3. 데이터 로드 로직
+# 2. 데이터 로드 로직 (data.xlsx 전용)
 @st.cache_data
 def load_data():
-    # 파일명은 실제 깃허브에 올린 이름과 정확히 일치해야 합니다.
-    file_path = 'data.csv' if os.path.exists('data.csv') else 'data.xlsx'
+    file_path = 'data.xlsx'
     if not os.path.exists(file_path):
         return pd.DataFrame()
     
     try:
-        if file_path.endswith('.csv'):
-            try:
-                df = pd.read_csv(file_path, skiprows=2, encoding='utf-8')
-            except:
-                df = pd.read_csv(file_path, skiprows=2, encoding='cp949')
-        else:
-            df = pd.read_excel(file_path, skiprows=2)
-            
-        df['대학명'] = df.iloc[:, 2].fillna('').astype(str)
-        df['모집단위'] = df.iloc[:, 3].fillna('').astype(str) + " " + df.iloc[:, 4].fillna('').astype(str)
-        df['핵심과목'] = df.iloc[:, 5].fillna('-').astype(str)
-        df['권장과목'] = df.iloc[:, 6].fillna('-').astype(str) if len(df.columns) > 6 else '-'
+        # data.xlsx 구조 분석 결과: 3번째 줄(index 2)부터 실제 데이터 시작
+        df = pd.read_excel(file_path, skiprows=3, header=None)
         
-        return df.replace('nan', '', regex=True).drop_duplicates()
-    except:
+        # 컬럼 매핑 (data.xlsx 기준)
+        # index 2: 대학명, index 3: 모집단위(학과), index 5: 핵심과목, index 6: 권장과목
+        processed_df = pd.DataFrame()
+        processed_df['대학명'] = df[2].fillna('').astype(str)
+        processed_df['모집단위'] = df[3].fillna('').astype(str)
+        processed_df['핵심과목'] = df[5].fillna('-').astype(str)
+        processed_df['권장과목'] = df[6].fillna('-').astype(str)
+        processed_df['비고'] = df[7].fillna('-').astype(str) if 7 in df.columns else '-'
+        
+        # 불필요한 공백 및 'nan' 문자열 제거
+        processed_df = processed_df.replace('nan', '', regex=True)
+        return processed_df.drop_duplicates()
+    except Exception as e:
+        st.error(f"데이터 로드 오류: {e}")
         return pd.DataFrame()
 
 df = load_data()
 
-# 4. 검색 인터페이스
+# 3. 검색 및 결과 화면
 if not df.empty:
     with st.form("search_form"):
-        st.markdown("### 🔍 Search Query")
-        u_keyword = st.text_input("🏛️ University", placeholder="대학명 입력")
-        d_keyword = st.text_input("💻 Department", placeholder="학과명 입력")
-        submit_button = st.form_submit_button("RUN ANALYSIS", use_container_width=True)
+        col1, col2 = st.columns(2)
+        with col1:
+            u_keyword = st.text_input("🏛️ 대학명", placeholder="예: 서울대")
+        with col2:
+            d_keyword = st.text_input("💻 학과/모집단위", placeholder="예: 컴퓨터")
+        
+        submit_button = st.form_submit_button("데이터 분석 실행", use_container_width=True)
 
     if submit_button:
-        result = df.copy()
-        if u_keyword:
-            result = result[result['대학명'].str.contains(u_keyword, na=False, case=False)]
-        if d_keyword:
-            result = result[result['모집단위'].str.contains(d_keyword, na=False, case=False)]
-        
-        if result.empty:
-            st.warning("데이터가 없습니다.")
+        if not u_keyword and not d_keyword:
+            st.info("검색어를 입력해주세요.")
         else:
-            for _, row in result.iterrows():
-                with st.expander(f"📍 [{row['대학명']}] {row['모집단위']}"):
-                    st.markdown(f"**🔹 핵심과목:** <span class='highlight-blue'>{row['핵심과목']}</span>", unsafe_allow_html=True)
-                    st.markdown(f"**🔸 권장과목:** <span class='highlight-green'>{row['권장과목']}</span>", unsafe_allow_html=True)
+            result = df.copy()
+            if u_keyword:
+                result = result[result['대학명'].str.contains(u_keyword, na=False)]
+            if d_keyword:
+                result = result[result['모집단위'].str.contains(d_keyword, na=False)]
+            
+            if result.empty:
+                st.warning("일치하는 정보가 없습니다.")
+            else:
+                st.success(f"총 {len(result)}건의 결과를 찾았습니다.")
+                for _, row in result.iterrows():
+                    with st.expander(f"📍 [{row['대학명']}] {row['모집단위']}"):
+                        if row['핵심과목'] and row['핵심과목'] != '-':
+                            st.markdown(f"**🔹 핵심과목:** <span class='highlight-blue'>{row['핵심과목']}</span>", unsafe_allow_html=True)
+                        if row['권장과목'] and row['권장과목'] != '-':
+                            st.markdown(f"**🔸 권장과목:** <span class='highlight-green'>{row['권장과목']}</span>", unsafe_allow_html=True)
+                        if row['비고'] and row['비고'] != '-':
+                            st.markdown(f"**📎 비고:** {row['비고']}")
 else:
-    st.info("데이터 파일을 찾을 수 없습니다. (data.csv 파일을 확인하세요)")
+    st.error("data.xlsx 파일을 찾을 수 없습니다. 깃허브에 파일을 올렸는지 확인해주세요.")
