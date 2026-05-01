@@ -4,12 +4,12 @@ import os
 
 # 1. 웹 페이지 기본 설정 (서울고 테마)
 st.set_page_config(
-    page_title="서울고 진로진학 데이터 연구소",
+    page_title="서울고 진로진학 데이터 연구소 JMJ",
     page_icon="🏛️",
     layout="centered"
 )
 
-# --- 🎨 서울고 남학생 개발자 스타일 디자인 (Blue & Green CSS) ---
+# --- 🎨 서울고 (Blue & Green CSS) ---
 st.markdown("""
 <style>
     /* 전체 배경: 깔끔한 화이트 & 연한 그레이 */
@@ -80,7 +80,7 @@ st.markdown("""
 <div style='text-align: center; padding: 40px 0 20px 0;'>
     <div style='font-size: 3.5rem; margin-bottom: 10px;'>🏛️</div>
     <h1 style='color: #0F172A; font-size: 2.2rem; margin: 0; font-weight: 800; letter-spacing: -1px;'>서울고등학교 진로진학 데이터 연구소</h1>
-    <p style='color: #64748B; font-size: 1.1rem; margin-top: 10px; font-weight: 500;'>Self-Directed Career Path Explorer</p>
+    <p style='color: #64748B; font-size: 1.1rem; margin-top: 10px; font-weight: 500;'>JMJ가 만든 첫번째 버전</p>
 </div>
 <div style='text-align: center; padding-bottom: 40px;'>
     <div style='display: inline-block; background-color: #E0F2FE; padding: 8px 20px; border-radius: 50px;'>
